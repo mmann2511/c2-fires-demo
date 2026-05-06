@@ -54,3 +54,13 @@ func getUnits(db *sql.DB) []Unit {
 	return units
 
 }
+
+func getUnitByID(db *sql.DB, unitID string) Unit {
+	var unit Unit
+	err := db.QueryRow("SELECT unit_id, unit_type, squadron, lat, lon, status, time_stamp FROM units WHERE unit_id = $1", unitID).Scan(&unit.ID, &unit.Type, &unit.Squadron, &unit.Lat, &unit.Lon, &unit.Status, &unit.TimeStamp)
+	if err != nil {
+		log.Fatal("Failed getUnitByID:", err)
+	}
+
+	return unit
+}

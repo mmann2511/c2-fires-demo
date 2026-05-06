@@ -44,6 +44,27 @@ func startServer(db *sql.DB) {
 
 	})
 
+	http.HandleFunc("/unit/", func(w http.ResponseWriter, r *http.Request) {
+		// Pluck the ID from R
+		id := r.URL.Path[len("/unit/"):]
+
+		// IF NOT A GET METHOD RETURN
+		if r.Method != http.MethodGet {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
+		// GRAB UNIT
+		unit := getUnitByID(db, id)
+		// NOW ENCODE TO JSON and RESPOND
+		err := json.NewEncoder(w).Encode(unit)
+		if err != nil {
+			http.Error(w, "Failed to write to JSON", http.StatusBadRequest)
+			return
+		}
+		fmt.Fprintf(w, "GET Request Success (getUnitByID)")
+	})
+
 	fmt.Println("Server running on port 8080")
 	http.ListenAndServe(":8080", nil)
 }
