@@ -29,14 +29,14 @@ func runSimulator(serverURL string) {
 			for {
 				unit.Lat += (rand.Float64() - 0.5) * 0.01
 				unit.Lon += (rand.Float64() - 0.5) * 0.01
-				sendUpdate(serverURL, unit)
+				sendInsert(serverURL, unit)
 				time.Sleep(time.Duration(5) * time.Second)
 			}
 		}(unit)
 	}
 }
 
-func sendUpdate(serverURL string, unit Unit) {
+func sendInsert(serverURL string, unit Unit) {
 	body, err := json.Marshal(unit)
 	if err != nil {
 		log.Println("Failed to encode unit:", err)

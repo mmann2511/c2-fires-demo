@@ -64,3 +64,10 @@ func getUnitByID(db *sql.DB, unitID string) Unit {
 
 	return unit
 }
+
+func deleteUnit(db *sql.DB, unitID string) {
+	_, err := db.Exec("DELETE FROM units WHERE unit_id = $1", unitID)
+	if err != nil {
+		log.Fatal("Failed deleteUnit:", err)
+	}
+}
