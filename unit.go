@@ -19,7 +19,7 @@ type Unit struct {
 }
 
 func insertUnit(db *sql.DB, unit Unit) {
-	_, err := db.Exec(`INSERT OR IGNORE INTO units (
+	_, err := db.Exec(`INSERT OR REPLACE INTO units (
 					unit_id, unit_type, squadron, lat, lon, status, time_stamp)
 					VALUES ($1, $2, $3, $4, $5, $6, $7);`,
 		unit.ID, unit.Type, unit.Squadron, unit.Lat, unit.Lon, unit.Status, unit.TimeStamp)

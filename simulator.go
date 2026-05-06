@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
-	"sync"
 	"time"
 )
 
@@ -24,17 +24,16 @@ var units = []Unit{
 }
 
 func runSimulator(serverURL string) {
-	var wg sync.WaitGroup
-
 	for _, unit := range units {
-		wg.Add(1)
 		go func(unit Unit) { // launches all at same time
-			defer wg.Done()
-			sendUpdate(serverURL, unit)
+			for {
+				unit.Lat += (rand.Float64() - 0.5) * 0.01
+				unit.Lon += (rand.Float64() - 0.5) * 0.01
+				sendUpdate(serverURL, unit)
+				time.Sleep(time.Duration(5) * time.Second)
+			}
 		}(unit)
 	}
-
-	wg.Wait()
 }
 
 func sendUpdate(serverURL string, unit Unit) {
