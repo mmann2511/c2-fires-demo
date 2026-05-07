@@ -1,7 +1,31 @@
-Building a Go HTTP server simulating a small-scale command and control data ingestion pipeline. A simulator concurrently sends unit position and status updates via REST API POST requests using goroutines. The server handles each request concurrently, writing to a SQLite database. Unit data can be retrieved via a GET endpoint returning JSON.
+# unit-tracker-go
 
-## Tech Stack
+A small-scale Command and Control (C2) data ingestion pipeline built in Go.
+
+## Overview
+A Go HTTP server receives concurrent unit position and status updates from a simulator, 
+writing to a PostgreSQL database using REST API endpoints. Demonstrates concurrent data 
+ingestion using goroutines and a relational database backend.
+
+## Stack
 - Go
-- SQLite
+- PostgreSQL
 - REST API (net/http)
 - Goroutines for concurrency
+
+## Endpoints
+- `POST /unit` — insert or update a unit
+- `GET /units` — return all units
+- `GET /unit/{id}` — return a specific unit
+- `GET /units/status/{status}` — filter by status
+- `GET /units/type/{type}` — filter by unit type
+- `GET /units/squadron/{squadron}` — filter by squadron
+- `GET /units/count` — total unit count
+- `GET /units/nearby?lat={lat}&lon={lon}&radius={radius}` — units within radius (miles)
+- `DELETE /unit/{id}` — remove a unit
+
+## Setup
+Set the database password as an environment variable:
+```
+DB_PASSWORD=your_password_here
+```

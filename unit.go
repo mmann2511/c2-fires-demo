@@ -6,7 +6,7 @@ import (
 	"log"
 	"math"
 
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/lib/pq"
 )
 
 type Unit struct {
@@ -20,9 +20,13 @@ type Unit struct {
 }
 
 func insertUnit(db *sql.DB, unit Unit) {
-	_, err := db.Exec(`INSERT OR REPLACE INTO units (
+	_, err := db.Exec(`INSERT INTO units (
 					unit_id, unit_type, squadron, lat, lon, status, time_stamp)
-					VALUES ($1, $2, $3, $4, $5, $6, $7);`,
+					VALUES ($1, $2, $3, $4, $5, $6, $7)
+					ON CONFLICT (unit_id) DO UPDATE SET
+					lat = EXCLUDED.lat,
+					lon = EXCLUDED.lon,
+					time_stamp = EXCLUDED.time_stamp`,
 		unit.ID, unit.Type, unit.Squadron, unit.Lat, unit.Lon, unit.Status, unit.TimeStamp)
 	if err != nil {
 		log.Fatal("Failed insertUnit:", err)

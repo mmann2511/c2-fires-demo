@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strconv"
 
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/lib/pq"
 )
 
 func startServer(db *sql.DB) {
