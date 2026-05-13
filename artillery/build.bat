@@ -1,0 +1,1 @@
+g++ main.cpp -o main -IC:\Users\Michael\vcpkg\vcpkg-master\installed\x64-windows\include -LC:\Users\Michael\vcpkg\vcpkg-master\installed\x64-windows\lib -lcurl

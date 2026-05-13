@@ -1,17 +1,30 @@
-# unit-tracker-go
+To rename the folder in PowerShell:
 
-A small-scale Command and Control (C2) data ingestion pipeline built in Go.
+```
+Rename-Item C:\Users\Michael\unit-tracker C:\Users\Michael\c2-fires-demo
+```
+
+Here's the updated README:
+
+```markdown
+# c2-fires-demo
+
+A small-scale Command and Control (C2) fires deconfliction system demonstrating a C++/Go/PostgreSQL architecture.
 
 ## Overview
-A Go HTTP server receives concurrent unit position and status updates from a simulator, 
-writing to a PostgreSQL database using REST API endpoints. Demonstrates concurrent data 
-ingestion using goroutines and a relational database backend.
+A ground unit simulator moves toward a target, calls in the target location via REST API, then moves to a safe distance. A C++ artillery system polls for active targets, checks for nearby friendly units, and fires only when the area is clear. All data flows through a Go HTTP server backed by PostgreSQL.
 
 ## Stack
-- Go
-- PostgreSQL
-- REST API (net/http)
-- Goroutines for concurrency
+- Go — HTTP server, REST API, TACP simulator
+- C++ (libcurl) — artillery deconfliction system
+- PostgreSQL — operational data store
+- Goroutines — concurrent unit position updates
+
+## Architecture
+```
+C++ Artillery → GET /targets, GET /units/nearby → Go Server → PostgreSQL
+Go Simulator → POST /unit, POST /target → Go Server → PostgreSQL
+```
 
 ## Endpoints
 - `POST /unit` — insert or update a unit
@@ -23,9 +36,14 @@ ingestion using goroutines and a relational database backend.
 - `GET /units/count` — total unit count
 - `GET /units/nearby?lat={lat}&lon={lon}&radius={radius}` — units within radius (miles)
 - `DELETE /unit/{id}` — remove a unit
+- `POST /target` — report a new target
+- `GET /targets` — return all targets
+- `GET /target/{id}` — return a specific target
+- `PUT /target/{id}?status={status}` — update target status
 
 ## Setup
 Set the database password as an environment variable:
 ```
 DB_PASSWORD=your_password_here
+```
 ```
