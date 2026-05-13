@@ -1,12 +1,3 @@
-To rename the folder in PowerShell:
-
-```
-Rename-Item C:\Users\Michael\unit-tracker C:\Users\Michael\c2-fires-demo
-```
-
-Here's the updated README:
-
-```markdown
 # c2-fires-demo
 
 A small-scale Command and Control (C2) fires deconfliction system demonstrating a C++/Go/PostgreSQL architecture.
@@ -21,10 +12,8 @@ A ground unit simulator moves toward a target, calls in the target location via 
 - Goroutines — concurrent unit position updates
 
 ## Architecture
-```
 C++ Artillery → GET /targets, GET /units/nearby → Go Server → PostgreSQL
 Go Simulator → POST /unit, POST /target → Go Server → PostgreSQL
-```
 
 ## Endpoints
 - `POST /unit` — insert or update a unit
@@ -43,7 +32,4 @@ Go Simulator → POST /unit, POST /target → Go Server → PostgreSQL
 
 ## Setup
 Set the database password as an environment variable:
-```
 DB_PASSWORD=your_password_here
-```
-```
