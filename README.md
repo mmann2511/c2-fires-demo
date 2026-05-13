@@ -12,8 +12,8 @@ A ground unit simulator moves toward a target, calls in the target location via 
 - Goroutines — concurrent unit position updates
 
 ## Architecture
-C++ Artillery → GET /targets, GET /units/nearby → Go Server → PostgreSQL
-Go Simulator → POST /unit, POST /target → Go Server → PostgreSQL
+- C++ Artillery → GET /targets, GET /units/nearby → Go Server → PostgreSQL
+- Go Simulator → POST /unit, POST /target → Go Server → PostgreSQL
 
 ## Endpoints
 - `POST /unit` — insert or update a unit
