@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"log"
@@ -33,6 +34,17 @@ func insertUnit(db *sql.DB, unit Unit) {
 	}
 
 	fmt.Println("Success insertUnit")
+}
+
+func updateUnit(db *sql.DB, unit Unit) {
+	_, err := db.Exec(`UPDATE units SET lat = $1, lon = $2, status = $3, 
+					time_stamp = $4 WHERE unit_id = $5`,
+		unit.Lat, unit.Lon, unit.Status,
+		unit.TimeStamp, unit.ID)
+	if err != nil {
+		log.Fatal("Failed updateUnit:", err)
+	}
+	fmt.Println("updateUnit success.")
 }
 
 func getUnits(db *sql.DB) []Unit {
@@ -173,4 +185,40 @@ func deleteUnit(db *sql.DB, unitID string) {
 	if err != nil {
 		log.Fatal("Failed deleteUnit:", err)
 	}
+}
+
+func reportThreat(db *sql.DB, unit Unit, target Target) {
+	ctx := context.Background()
+	tx, err := db.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelReadCommitted})
+	if err != nil {
+		log.Fatal("Failed to initiate transaction", err)
+	}
+
+	_, err = tx.ExecContext(ctx, `UPDATE units SET lat = $1, lon = $2,
+	 	status = $3, time_stamp = $4 WHERE unit_id = $5`,
+		unit.Lat, unit.Lon, unit.Status, unit.TimeStamp, unit.ID)
+	if err != nil {
+		tx.Rollback()
+		log.Fatal("Failed to update Unit", err)
+	}
+
+	_, err = tx.ExecContext(ctx, `INSERT INTO targets (
+			target_id, description, lat, lon, status, time_stamp)
+			VALUES($1, $2, $3, $4, $5, $6)
+			ON CONFLICT (target_id) DO NOTHING`,
+		target.ID, target.Description, target.Lat, target.Lon, target.Status,
+		target.TimeStamp)
+	if err != nil {
+		tx.Rollback()
+		log.Fatal("Failed to insert Target", err)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		tx.Rollback()
+		log.Fatal("Failed to commit reportThreat Transaction:", err)
+	}
+
+	fmt.Println("reportThreat transaction successful")
+
 }

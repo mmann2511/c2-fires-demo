@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html><head>
+    <title>C2 Dashboard</title>
+</head>
+<body>
+    <h1>C2 Operational Dashboard</h1>
+
+    <h2>Units</h2>
+    <table id="units-table">
+        <tr>
+            <th>ID</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Lat</th>
+            <th>Lon</th>
+            <th>Last Updated</th>
+        </tr>
+    </table>
+
+    <h2>Active Threats</h2>
+    <table id="threats-table">
+        <tr>
+            <th>ID</th>
+            <th>Description</th>
+            <th>Status</th>
+            <th>Lat</th>
+            <th>Lon</th>
+        </tr>
+    </table>
+
+    <script>
+        function fetchUnits() {
+            fetch('http://localhost:8080/units')
+                .then(response => response.json())
+                .then(units => {
+                    const table = document.getElementById('units-table');
+                    // clear existing rows except header
+                    while (table.rows.length > 1) {
+                        table.deleteRow(1);
+                    }
+                    units.forEach(unit => {
+                        const row = table.insertRow();
+                        row.insertCell().textContent = unit.ID;
+                        row.insertCell().textContent = unit.Type;
+                        row.insertCell().textContent = unit.Status;
+                        row.insertCell().textContent = unit.Lat.toFixed(4);
+                        row.insertCell().textContent = unit.Lon.toFixed(4);
+                        row.insertCell().textContent = unit.TimeStamp;
+                    });
+                });
+        }
+
+        fetchUnits();
+        setInterval(fetchUnits, 5000);
+
+        function fetchThreats() {
+            fetch('http://localhost:8080/targets')
+                .then(response => response.json())
+                .then(targets => {
+                    const table = document.getElementById('threats-table');
+                    // clear existing rows except header
+                    while (table.rows.length > 1) {
+                        table.deleteRow(1);
+                    }
+                    targets.forEach(target => {
+                        const row = table.insertRow();
+                        row.insertCell().textContent = target.ID;
+                        row.insertCell().textContent = target.Description;
+                        row.insertCell().textContent = target.Status;
+                        row.insertCell().textContent = target.Lat.toFixed(4);
+                        row.insertCell().textContent = target.Lon.toFixed(4);
+                    });
+                });
+        }
+
+        fetchThreats();
+        setInterval(fetchThreats, 5000);
+
+
+    </script>
+</body>
+</html>

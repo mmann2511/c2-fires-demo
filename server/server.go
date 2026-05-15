@@ -28,6 +28,60 @@ func startServer(db *sql.DB) {
 		fmt.Fprintf(w, "Success insertUnit from Server")
 	})
 
+	http.HandleFunc("/report-threat", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
+		var body struct {
+			Unit   Unit
+			Target Target
+		}
+		err := json.NewDecoder(r.Body).Decode(&body)
+		if err != nil {
+			http.Error(w, "Invalid JSON", http.StatusBadRequest)
+			return
+		}
+
+		reportThreat(db, body.Unit, body.Target)
+		fmt.Fprintf(w, "Threat reported successfully")
+	})
+
+	http.HandleFunc("/unit/", func(w http.ResponseWriter, r *http.Request) {
+		// Pluck the ID from R
+		id := r.URL.Path[len("/unit/"):]
+
+		// IF NOT A GET METHOD RETURN
+		switch r.Method {
+		case http.MethodGet:
+			unit := getUnitByID(db, id)
+			err := json.NewEncoder(w).Encode(unit)
+			if err != nil {
+				http.Error(w, "Failed to write to JSON", http.StatusBadRequest)
+				return
+			}
+			fmt.Println("GET Request Success (getUnitByID)")
+		case http.MethodPut:
+			var unit Unit
+			err := json.NewDecoder(r.Body).Decode(&unit)
+			if err != nil {
+				http.Error(w, "Invalid JSON", http.StatusBadRequest)
+				return
+			}
+			unit.ID = id
+			updateUnit(db, unit)
+			fmt.Fprintf(w, "Unit %s updated successfully", id)
+
+		case http.MethodDelete:
+			deleteUnit(db, id)
+			fmt.Fprintf(w, "DELETE Request Success (deleteUnit)")
+		default:
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		}
+
+	})
+
 	http.HandleFunc("/units", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -151,29 +205,6 @@ func startServer(db *sql.DB) {
 		//fmt.Fprintf(w, "GET Request Success (units/nearby)")
 	})
 
-	http.HandleFunc("/unit/", func(w http.ResponseWriter, r *http.Request) {
-		// Pluck the ID from R
-		id := r.URL.Path[len("/unit/"):]
-
-		// IF NOT A GET METHOD RETURN
-		switch r.Method {
-		case http.MethodGet:
-			unit := getUnitByID(db, id)
-			err := json.NewEncoder(w).Encode(unit)
-			if err != nil {
-				http.Error(w, "Failed to write to JSON", http.StatusBadRequest)
-				return
-			}
-			fmt.Println("GET Request Success (getUnitByID)")
-		case http.MethodDelete:
-			deleteUnit(db, id)
-			fmt.Fprintf(w, "DELETE Request Success (deleteUnit)")
-		default:
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		}
-
-	})
-
 	///////////////////////////////////////////////////////
 	/////////////// TARGET HANDLERS ///////////////////////
 	///////////////////////////////////////////////////////
@@ -231,6 +262,10 @@ func startServer(db *sql.DB) {
 			fmt.Fprintf(w, "Target %s status updated to %s", id, status)
 
 		}
+	})
+
+	http.HandleFunc("/dashboard", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "dashboard.html")
 	})
 
 	fmt.Println("Server running on port 8080")

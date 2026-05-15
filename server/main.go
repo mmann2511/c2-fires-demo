@@ -23,9 +23,10 @@ func main() {
 	fmt.Println("Connected to database")
 
 	setupDB(db)
+	db.Exec("DELETE FROM targets")
 	go startServer(db)
 	time.Sleep(time.Second)
-	go tacpSimulator("http://localhost:8080", db)
+	//go tacpSimulator("http://localhost:8080", db)
 	//runSimulator("http://localhost:8080")
 	select {}
 

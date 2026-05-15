@@ -8,53 +8,6 @@
 #include <nlohmann/json.hpp>
 #include <cmath>
 
-/// Artillery Systsem that
-// GETs the ACTIVE TARGET
-// GETs nearby friendly units around the target
-// Decides to fire or hold
-
-
-struct Unit {
-    std::string ID;
-    std::string Type;
-    std::string Squadron;
-    double Lat;
-    double Lon;
-    std::string Status;
-    std::string TimeStamp; 
-
-};
-
-std::string unitToJson(Unit unit) {
-    return "{\"ID\":\"" + unit.ID + "\","
-            "\"Type\":\"" + unit.Type + "\","
-            "\"Squadron\":\"" + unit.Squadron + "\","
-            "\"Lat\":" + std::to_string(unit.Lat) + ","
-            "\"Lon\":" + std::to_string(unit.Lon) + ","
-            "\"Status\":\"" + unit.Status + "\","
-            "\"TimeStamp\":\"" + unit.TimeStamp + "\"}";
-}
-
-void sendUpdate(Unit unit) {
-    CURL* curl = curl_easy_init();
-    if (curl) {
-        std::string json = unitToJson(unit);
-        std::string url = "http://localhost:8080/unit";
-
-        struct curl_slist* headers = nullptr;
-        headers = curl_slist_append(headers, "Content-Type: application/json");
-
-        curl_easy_setopt(curl, CURLOPT_URL, url.c_str()); //WHERE DO I SEND THE POST REQUEST?
-        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json.c_str());
-        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-        
-        curl_easy_perform(curl);
-        curl_easy_cleanup(curl);
-        curl_slist_free_all(headers);
-
-
-    }
-}
 
 size_t writeCallBack(char* data, size_t size, size_t nmemb, std::string* response) {
     response->append(data, size * nmemb);
